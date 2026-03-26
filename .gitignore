@@ -1,3 +1,17 @@
+# Global
+.DS_Store
+Thumbs.db
+
+# Python virtual envs
 .venv/
-# Ignore large CSV file
+venv/
+
+# Frontend deps at repo root (if any)
+node_modules/
+
+# Local env files
+.env
+.env.*
+
+# Existing project data ignore
 backend/data/symptoms.csv

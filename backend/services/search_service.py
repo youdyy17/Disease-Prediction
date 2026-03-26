@@ -1,10 +1,9 @@
-from data.readCSV import load_data
+from ml_service import get_symptoms
 
-# Load data once
-data = load_data()
 
-def search_symptoms(query: str):
-    # Example: Replace with real search logic or database query
-    symptoms = data['diseases'].tolist()  # Replace 'symptom_column' with the actual column name
-    results = [item for item in symptoms if query.lower() in item.lower()]
-    return results
+def search_symptoms(query: str) -> list[str]:
+    symptoms = get_symptoms()
+    q = query.strip().lower()
+    if not q:
+        return symptoms[:25]
+    return [item for item in symptoms if q in item.lower()][:25]
