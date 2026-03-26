@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from backend.services.search_service import search_symptoms
+from services.search_service import search_symptoms
 
 api_bp = Blueprint("api", __name__)
 
