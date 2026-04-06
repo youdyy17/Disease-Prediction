@@ -15,3 +15,5 @@ node_modules/
 
 # Existing project data ignore
 backend/data/symptoms.csv
+
+Training_2.csv
