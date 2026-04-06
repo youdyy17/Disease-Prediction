@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { PredictionResponse, SymptomsResponse } from '../types';
+import './searchSymthom.css';
 
 const API_BASE = 'http://127.0.0.1:5001/api';
 
@@ -78,85 +79,105 @@ function SearchSymthom() {
     };
 
     return (
-        <div style={{ maxWidth: 900, margin: '20px auto', fontFamily: 'Arial, sans-serif' }}>
-            <h2>Disease Prediction</h2>
-            <p>Select symptoms, then get top 5 possible diseases.</p>
+        <div className="prediction-page">
+            <header className="hero">
+                <p className="eyebrow">AI Health Assistant</p>
+                <h1>Disease Prediction</h1>
+                <p className="hero-subtitle">
+                    Search and select symptoms to get the top 5 likely diseases with confidence scores.
+                </p>
+            </header>
 
-            <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search symptoms..."
-                style={{ width: '100%', padding: 10, marginBottom: 12 }}
-            />
+            <div className="content-grid">
+                <section className="panel">
+                    <div className="panel-head">
+                        <h2>Choose Symptoms</h2>
+                        <span className="badge">{filteredSymptoms.length} shown</span>
+                    </div>
 
-            <div style={{ display: 'flex', gap: 20 }}>
-                <div
-                    style={{
-                        flex: 1,
-                        border: '1px solid #ddd',
-                        borderRadius: 8,
-                        padding: 12,
-                        maxHeight: 340,
-                        overflowY: 'auto',
-                    }}
-                >
-                    {filteredSymptoms.map((symptom) => {
-                        const checked = selectedSymptoms.includes(symptom);
-                        return (
-                            <label
-                                key={symptom}
-                                style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}
-                            >
-                                <input
-                                    type="checkbox"
-                                    checked={checked}
-                                    onChange={() => toggleSymptom(symptom)}
-                                />
-                                <span>{symptom}</span>
-                            </label>
-                        );
-                    })}
-                </div>
+                    <input
+                        type="text"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="Search symptoms..."
+                        className="search-input"
+                    />
 
-                <div style={{ flex: 1 }}>
-                    <p><strong>Selected symptoms:</strong> {selectedSymptoms.length}</p>
+                    <div className="symptom-list">
+                        {filteredSymptoms.length === 0 && (
+                            <p className="empty-state">No symptoms match your search.</p>
+                        )}
+
+                        {filteredSymptoms.map((symptom) => {
+                            const checked = selectedSymptoms.includes(symptom);
+                            return (
+                                <label key={symptom} className={`symptom-item ${checked ? 'selected' : ''}`}>
+                                    <input
+                                        type="checkbox"
+                                        checked={checked}
+                                        onChange={() => toggleSymptom(symptom)}
+                                    />
+                                    <span>{symptom}</span>
+                                </label>
+                            );
+                        })}
+                    </div>
+                </section>
+
+                <section className="panel">
+                    <div className="panel-head">
+                        <h2>Prediction Result</h2>
+                        <span className="badge">{selectedSymptoms.length} selected</span>
+                    </div>
+
                     <button
                         onClick={getPrediction}
                         disabled={loading || selectedSymptoms.length === 0}
-                        style={{ padding: '10px 16px', cursor: 'pointer' }}
+                        className="primary-btn"
                     >
                         {loading ? 'Predicting...' : 'Predict Top 5 Diseases'}
                     </button>
 
-                    {error && <p style={{ color: 'crimson', marginTop: 12 }}>{error}</p>}
+                    {selectedSymptoms.length > 0 && (
+                        <div className="chip-wrap" aria-label="Selected symptoms list">
+                            {selectedSymptoms.slice(0, 18).map((symptom) => (
+                                <span className="chip" key={symptom}>{symptom}</span>
+                            ))}
+                            {selectedSymptoms.length > 18 && (
+                                <span className="chip more">+{selectedSymptoms.length - 18} more</span>
+                            )}
+                        </div>
+                    )}
+
+                    {error && <p className="error-text">{error}</p>}
+
+                    {!prediction && !loading && !error && (
+                        <p className="empty-state">Choose symptoms and run prediction to view results.</p>
+                    )}
 
                     {prediction && (
-                        <div style={{ marginTop: 16 }}>
-                            <p>
-                                <strong>Model:</strong> {prediction.model} ({prediction.accuracy.toFixed(2)}% validation accuracy)
+                        <div className="result-wrap">
+                            <p className="model-meta">
+                                <strong>Model:</strong> {prediction.model} • {prediction.accuracy.toFixed(2)}% validation accuracy
                             </p>
+
                             {prediction.predictions.map((item) => (
-                                <div key={item.disease} style={{ marginBottom: 10 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <div key={item.disease} className="result-item">
+                                    <div className="result-head">
                                         <span>{item.disease}</span>
-                                        <span>{item.probability.toFixed(2)}%</span>
+                                        <strong>{item.probability.toFixed(2)}%</strong>
                                     </div>
-                                    <div style={{ background: '#eee', borderRadius: 8, height: 10 }}>
+                                    <div className="progress-track">
                                         <div
-                                            style={{
-                                                width: `${item.probability}%`,
-                                                background: '#2f80ed',
-                                                height: '100%',
-                                                borderRadius: 8,
-                                            }}
+                                            className="progress-fill"
+                                            style={{ width: `${Math.max(0, Math.min(100, item.probability))}%` }}
                                         />
                                     </div>
                                 </div>
                             ))}
                         </div>
                     )}
-                </div>
+                </section>
             </div>
         </div>
     );

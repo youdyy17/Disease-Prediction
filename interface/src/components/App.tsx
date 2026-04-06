@@ -3,7 +3,7 @@ import SearchSymthom from '../pages/searchSymthom';
 
 const App: React.FC = () => {
     return (
-        <div>
+        <div className="app-shell">
             <SearchSymthom />
         </div>
     );
